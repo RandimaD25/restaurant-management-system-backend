@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { registerUser, generateToken } from "../services/user-service";
+import {
+  registerUser,
+  generateToken,
+  loginUser,
+} from "../services/user-service";
 
 export const userRegistration = async function (req: Request, res: Response) {
   try {
@@ -22,6 +26,23 @@ export const userRegistration = async function (req: Request, res: Response) {
       success: false,
       message: error.message || "Registration failed",
     });
-    console.log("Error:", error.message);
+  }
+};
+
+export const userLogin = async function (req: Request, res: Response) {
+  try {
+    const { email, password } = req.body;
+    const { id, data, token } = await loginUser(email, password);
+    return res.status(200).json({
+      id,
+      data,
+      message: "User logged in successfully",
+      token,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Login failed",
+    });
   }
 };

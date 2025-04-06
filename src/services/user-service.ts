@@ -44,3 +44,26 @@ export const registerUser = async function (email: string, password: string) {
 
   return newUser;
 };
+
+//user login
+export const loginUser = async function (email: string, password: string) {
+  if (!email || !password) {
+    throw new Error("Please enter all details");
+  }
+
+  const userExist = await prisma.user.findUnique({
+    where: { email: email },
+  });
+
+  if (!userExist) {
+    throw new Error("Email Address is incorrect");
+  }
+
+  const isPasswordMatched = await bcrypt.compare(password, userExist.password);
+  if (!isPasswordMatched) {
+    throw new Error("Password is incorrect");
+  }
+
+  const token = generateToken(userExist.userId);
+  return { id: userExist.userId, data: email, token };
+};
